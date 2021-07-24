@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IPausable
 {
     public UnityEvent OnPlayerLost;
     private Rigidbody m_Rb;
@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour
         m_ElevatorOffsetY = 0;
         m_CameraPos = followCamera.transform.position - m_Rb.position;
         m_SpeedModifier = 1;
+
+        enabled = false;
     }
     void FixedUpdate()
     {
@@ -67,6 +69,11 @@ public class PlayerController : MonoBehaviour
     private void LateUpdate() 
     {
         followCamera.transform.position = m_Rb.position + m_CameraPos;    
+    }
+
+    public void OnGameStart()
+    {
+        enabled = true;
     }
     private void OnCollisionEnter(Collision other) 
     {

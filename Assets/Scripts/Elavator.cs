@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Elavator : MonoBehaviour
+public class Elavator : MonoBehaviour, IPausable
 {
     private float m_TravelDistance = 0;
     private float m_MaxTravelDistance = 15.0f;
@@ -10,13 +10,12 @@ public class Elavator : MonoBehaviour
     private Coroutine m_ReverseCoroutine;
     private Rigidbody m_Rb;
 
-    private IEnumerator Start() 
+    private void Awake() 
     {
         m_Rb = GetComponent<Rigidbody>();
         enabled = false;
-        yield return new WaitForSeconds(3);
-        enabled = true;
     }
+
     void FixedUpdate()
     {
         if (m_TravelDistance >= m_MaxTravelDistance)
@@ -37,6 +36,16 @@ public class Elavator : MonoBehaviour
         }
     }
 
+    public void OnGameStart()
+    {
+        StartCoroutine(StartElevator());
+    }
+
+    private IEnumerator StartElevator() 
+    {
+        yield return new WaitForSeconds(3);
+        enabled = true;
+    }
     private IEnumerator ReverseElevator()
     {
         yield return new WaitForSeconds(3.0f);
