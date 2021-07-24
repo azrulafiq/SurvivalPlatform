@@ -1,33 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-//create circle without creating an instance
-public static class GameObjectFx
-{
-    public static void DrawCircle(this GameObject container, float radius, float lineWidth)
-    {
-        var segments = 360;
-        var lineRenderer = container.AddComponent<LineRenderer>();
-        lineRenderer.useWorldSpace = false;
-        lineRenderer.startWidth = lineWidth;
-        lineRenderer.endWidth = lineWidth;
-        lineRenderer.positionCount = segments + 1;
-
-        var points = new Vector3[lineRenderer.positionCount];
-
-        for (var i = 0 ; i < points.Length; i++)
-        {
-            var rad = Mathf.Deg2Rad * i;
-            points[i] = new Vector3(Mathf.Cos(rad) * radius, 0, Mathf.Sin(rad) * radius);
-        }
-
-        lineRenderer.SetPositions(points);
-    }
-}
 
 public class PlayerController : MonoBehaviour
 {
+    public UnityEvent OnPlayerLost;
     private Rigidbody m_Rb;
     private GameObject m_Elevator;
     public Camera followCamera;
@@ -36,18 +15,8 @@ public class PlayerController : MonoBehaviour
     private float m_SpeedModifier;
     private Vector3 m_CameraPos;
 
-    void Awake() {
-
-        GameObject go = new GameObject {
-            name = "Circle"
-        };
-        Vector3 circlePosition = Vector3.zero;
-
-        go.transform.parent = transform;
-        go.transform.localPosition = circlePosition;
-
-        go.DrawCircle(2.0f, .02f);
-
+    void Awake() 
+    {
         m_Rb = GetComponent<Rigidbody>();
         m_ElevatorOffsetY = 0;
         m_CameraPos = followCamera.transform.position - m_Rb.position;
@@ -55,6 +24,12 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        //condition to restart game if player lose
+        if (transform.position.y <= -15.0f)
+        {
+            OnPlayerLost.Invoke();
+        }
+
         // Get Input from user
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
